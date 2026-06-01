@@ -1,5 +1,12 @@
 import io
+import os
 from fpdf import FPDF
+
+FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')
+FONT_REGULAR = os.path.join(FONT_DIR, 'DejaVuSans.ttf')
+FONT_BOLD = os.path.join(FONT_DIR, 'DejaVuSans-Bold.ttf')
+FONT_ITALIC = os.path.join(FONT_DIR, 'DejaVuSans-Oblique.ttf')
+FONT_BOLD_ITALIC = os.path.join(FONT_DIR, 'DejaVuSans-BoldOblique.ttf')
 
 def generate_html(data):
     name = data.get('name', 'Name')
@@ -363,22 +370,26 @@ def generate_html(data):
 class ResumePDF(FPDF):
     def __init__(self):
         super().__init__(format='letter')
+        self.add_font('DejaVu', '', FONT_REGULAR)
+        self.add_font('DejaVu', 'B', FONT_BOLD)
+        self.add_font('DejaVu', 'I', FONT_ITALIC)
+        self.add_font('DejaVu', 'BI', FONT_BOLD_ITALIC)
         self.set_auto_page_break(auto=True, margin=54)
         self.add_page()
         self.set_margins(36, 36, 36)
 
     def header_section(self, name, contact_info):
-        self.set_font('Helvetica', 'B', 24)
+        self.set_font('DejaVu', 'B', 24)
         self.cell(0, 12, name, align='C', new_x='LMARGIN', new_y='NEXT')
         self.ln(2)
-        self.set_font('Helvetica', '', 10)
+        self.set_font('DejaVu', '', 10)
         self.set_text_color(80, 80, 80)
         self.cell(0, 5, contact_info, align='C', new_x='LMARGIN', new_y='NEXT')
         self.set_text_color(0, 0, 0)
         self.ln(4)
 
     def section_title(self, title):
-        self.set_font('Helvetica', 'B', 13)
+        self.set_font('DejaVu', 'B', 13)
         self.set_text_color(20, 20, 20)
         self.cell(0, 8, title.upper(), new_x='LMARGIN', new_y='NEXT')
         self.set_draw_color(200, 200, 200)
@@ -387,19 +398,19 @@ class ResumePDF(FPDF):
         self.ln(3)
 
     def subheading(self, left_title, right_text, left_subtitle='', right_subtitle=''):
-        self.set_font('Helvetica', 'B', 11)
+        self.set_font('DejaVu', 'B', 11)
         self.set_text_color(20, 20, 20)
         w = self.w - self.l_margin - self.r_margin
         self.cell(w * 0.7, 5, left_title)
-        self.set_font('Helvetica', '', 10)
+        self.set_font('DejaVu', '', 10)
         self.set_text_color(100, 100, 100)
         self.cell(w * 0.3, 5, right_text, align='R', new_x='LMARGIN', new_y='NEXT')
 
         if left_subtitle or right_subtitle:
-            self.set_font('Helvetica', 'I', 10)
+            self.set_font('DejaVu', 'I', 10)
             self.set_text_color(60, 60, 60)
             self.cell(w * 0.7, 5, left_subtitle)
-            self.set_font('Helvetica', '', 10)
+            self.set_font('DejaVu', '', 10)
             self.set_text_color(100, 100, 100)
             self.cell(w * 0.3, 5, right_subtitle, align='R', new_x='LMARGIN', new_y='NEXT')
 
@@ -407,7 +418,7 @@ class ResumePDF(FPDF):
         self.ln(1)
 
     def bullet_list(self, items):
-        self.set_font('Helvetica', '', 10)
+        self.set_font('DejaVu', '', 10)
         self.set_text_color(30, 30, 30)
         for item in items:
             self.set_x(self.l_margin + 4)
@@ -418,10 +429,10 @@ class ResumePDF(FPDF):
         self.ln(2)
 
     def skills_line(self, category, skills):
-        self.set_font('Helvetica', 'B', 10)
+        self.set_font('DejaVu', 'B', 10)
         self.set_text_color(20, 20, 20)
         self.cell(self.get_string_width(f'{category}: ') + 2, 5, f'{category}: ')
-        self.set_font('Helvetica', '', 10)
+        self.set_font('DejaVu', '', 10)
         self.set_text_color(50, 50, 50)
         w = self.w - self.l_margin - self.r_margin - self.get_x() + self.l_margin
         self.multi_cell(w, 5, skills, new_x='LMARGIN', new_y='NEXT')

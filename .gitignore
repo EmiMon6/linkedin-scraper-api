@@ -5,3 +5,6 @@ resume.html
 *.pdf
 .env
 venv/
+chrome_profile/
+test_output.pdf
+test_resume.*
