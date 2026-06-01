@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emilio Montoya - CV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --paper-bg: #ffffff;
+            --text-main: #141414;
+            --text-muted: #4d4d4d;
+            --border-color: #d3d3d3;
+            --font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.35;
+            padding: 2rem 1rem;
+            font-size: 11.5pt;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .letter-page {
+            width: 8.5in;
+            min-height: 11in;
+            background-color: var(--paper-bg);
+            padding: 0.5in 0.5in 0.75in 0.5in;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-download {
+            background-color: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-download:hover {
+            background-color: #0f172a;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        header h1 {
+            font-size: 24pt;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: var(--text-main);
+            font-size: 10.5pt;
+        }
+
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .separator {
+            color: var(--border-color);
+            margin: 0 4px;
+        }
+
+        section {
+            margin-bottom: 14px;
+        }
+
+        section h2.section-title {
+            font-size: 13pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .subheading-container {
+            margin-bottom: 8px;
+        }
+
+        .subheading-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .subheading-title {
+            font-weight: 700;
+            font-size: 11.5pt;
+        }
+
+        .subheading-subtitle {
+            font-style: italic;
+            font-size: 11pt;
+        }
+
+        .subheading-right {
+            font-size: 10.5pt;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 2px;
+        }
+
+        li {
+            font-size: 10.5pt;
+            margin-bottom: 2px;
+            position: relative;
+            padding-left: 14px;
+            text-align: justify;
+        }
+
+        li::before {
+            content: "\2022";
+            position: absolute;
+            left: 2px;
+            color: var(--text-main);
+            font-size: 9pt;
+            top: -1px;
+        }
+
+        .skills-list {
+            margin-top: 4px;
+        }
+
+        .skills-line {
+            font-size: 10.5pt;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .skills-line strong {
+            font-weight: 700;
+        }
+
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            .page-wrapper {
+                display: block;
+            }
+            .letter-page {
+                width: 100%;
+                min-height: auto;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            .controls {
+                display: none;
+            }
+            .subheading-container {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button class="btn-download" onclick="downloadPDF()">
+            Descargar CV en PDF
+        </button>
+    </div>
+
+    <div class="page-wrapper" id="resume-content">
+        <div class="letter-page">
+            <header>
+                <h1>Emilio Montoya</h1>
+                <div class="contact-info">
+                    <span>Quito, Ecuador</span>
+<span class="separator">|</span>
+<span>0998162606</span>
+<span class="separator">|</span>
+<span>emimon229@gmail.com</span>
+<span class="separator">|</span>
+<span>linkedin.com/in/emiliomontoya</span>
+<span class="separator">|</span>
+<span>github.com/EmiMon6</span>
+                </div>
+            </header>
+
+            <section>
+                <h2 class="section-title">EDUCATION</h2>
+                
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Universidad de Quito</span>
+                <span class="subheading-right">Quito, Ecuador</span>
+            </div>
+            <div class="subheading-row">
+                <span class="subheading-subtitle">Ingeniería en Ciencias de la Computación</span>
+                <span class="subheading-right">2020 - 2024</span>
+            </div>
+            <ul><li>Graduado con honores, especialización en Inteligencia Artificial y Sistemas Distribuidos.</li></ul>
+        </div>
+        
+            </section>
+
+            <section>
+                <h2 class="section-title">EXPERIENCE</h2>
+                
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Ditextil Importaciones</span>
+                <span class="subheading-right">Ene 2025 - Presente</span>
+            </div>
+            <div class="subheading-row">
+                <span class="subheading-subtitle">AI Operations Specialist & Developer</span>
+                <span class="subheading-right">Quito, Ecuador</span>
+            </div>
+            <ul><li>Automatización de tareas operativas de importación utilizando agentes e IA generativa.</li><li>Diseño e implementación de un dashboard en tiempo real de ventas y gestión de inventario.</li><li>Desarrollo de canales interactivos en WhatsApp con integraciones de IA para agilizar el flujo de información corporativa.</li></ul>
+        </div>
+        
+            </section>
+
+            <section>
+                <h2 class="section-title">PROJECTS</h2>
+                
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">LinkedIn Scraper API</span>
+                <span class="subheading-right">May 2026</span>
+            </div>
+            <ul><li>Desarrollo de API unificada para scraping de ofertas laborales de LinkedIn y generación automática de CV.</li><li>Integración de motor LaTeX para compilación de PDFs premium usando plantillas personalizadas.</li></ul>
+        </div>
+        
+            </section>
+
+            <section>
+                <h2 class="section-title">SKILLS</h2>
+                <div class="skills-list">
+                    
+        <div class="skills-line">
+            <strong>Languages:</strong> Python, JavaScript, HTML/CSS, SQL (PostgreSQL, MySQL), LaTeX
+        </div>
+        
+        <div class="skills-line">
+            <strong>Tools:</strong> Docker, Figma, GitHub, EasyPanel, n8n
+        </div>
+        
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function downloadPDF() {
+            const element = document.getElementById('resume-content');
+            const opt = {
+                margin:       0,
+                filename:     'Emilio_Montoya_CV.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2.2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>

@@ -4,6 +4,10 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup
 import time
+import re
+import random
+
+MAX_JOBS_LIMIT = 100
 
 # Diccionarios para traducir el texto de la interfaz a los códigos internos de LinkedIn
 TIME_POSTED_MAP = {
@@ -66,7 +70,7 @@ def scrape_linkedin_jobs(query, location, max_rows, radius, filters_text):
     
     jobs_list = []
     start = 0
-    max_rows = min(max_rows, 100) 
+    max_rows = min(max_rows, MAX_JOBS_LIMIT)
     
     # Procesamos los filtros de texto a los códigos que la API de LinkedIn entiende
     filters = {}
@@ -140,6 +144,7 @@ def scrape_linkedin_jobs(query, location, max_rows, radius, filters_text):
             seniority_level = "N/A"
             
             urn = card.get('data-entity-urn', '')
+            desc_soup = None
             if urn:
                 job_id = urn.split(':')[-1]
                 desc_url = f"https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{job_id}"
@@ -169,7 +174,6 @@ def scrape_linkedin_jobs(query, location, max_rows, radius, filters_text):
                 time.sleep(0.5)
                 
             # Buscar links y correos dentro de la descripción (ya que LinkedIn oculta el botón externo a invitados)
-            import re
             emails_in_desc = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', description)
             urls_in_desc = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', description)
             # Limpiar y quitar duplicados y urls de linkedin
@@ -180,7 +184,7 @@ def scrape_linkedin_jobs(query, location, max_rows, radius, filters_text):
 
             # Determinar si es Easy Apply (Solicitud sencilla)
             is_easy_apply = False
-            if 'desc_soup' in locals():
+            if desc_soup is not None:
                 buttons = desc_soup.find_all('button')
                 for btn in buttons:
                     text = btn.get_text(strip=True).lower()
@@ -204,48 +208,6 @@ def scrape_linkedin_jobs(query, location, max_rows, radius, filters_text):
             })
             
         start += 25
-        time.sleep(1)
+        time.sleep(random.uniform(1, 3))
         
     return {"status": "success", "total_jobs_found": len(jobs_list), "jobs": jobs_list}
-
-class LinkedinScraperHandler(http.server.SimpleHTTPRequestHandler):
-    def do_POST(self):
-        if self.path == '/api/scrape':
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            
-            try:
-                payload = json.loads(post_data.decode('utf-8'))
-                
-                query = payload.get("query", "")
-                location = payload.get("location", "")
-                max_rows = payload.get("maxRows", 25)
-                radius = payload.get("radius", "25")
-                include_description = payload.get("includeDescription", False)
-                
-                if not query or not location:
-                    raise ValueError("Please provide at least 'query' and 'location' in your JSON.")
-                
-                # Pasamos el JSON completo para extraer los filtros de texto
-                results = scrape_linkedin_jobs(query, location, max_rows, radius, payload)
-                
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps(results, indent=2).encode('utf-8'))
-                
-            except Exception as e:
-                self.send_response(400)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "error", "message": str(e)}).encode('utf-8'))
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-if __name__ == '__main__':
-    port = 8081
-    server_address = ('', port)
-    httpd = http.server.HTTPServer(server_address, LinkedinScraperHandler)
-    print(f"LinkedIn Scraper API listening on port {port}...")
-    httpd.serve_forever()

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+resume.html
+*.pdf
+.env
+venv/

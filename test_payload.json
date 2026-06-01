@@ -1,0 +1,61 @@
+{
+  "name": "Emilio Montoya",
+  "contact": {
+    "phone": "0998162606",
+    "email": "emimon229@gmail.com",
+    "youtube": "",
+    "location": "Quito, Ecuador",
+    "linkedin": "linkedin.com/in/emiliomontoya",
+    "github": "github.com/EmiMon6"
+  },
+  "experience": [
+    {
+      "company": "Ditextil Importaciones",
+      "date": "Ene 2025 - Presente",
+      "title": "AI Operations Specialist & Developer",
+      "location": "Quito, Ecuador",
+      "bullets": [
+        "Automatización de tareas operativas de importación utilizando agentes e IA generativa.",
+        "Diseño e implementación de un dashboard en tiempo real de ventas y gestión de inventario.",
+        "Desarrollo de canales interactivos en WhatsApp con integraciones de IA para agilizar el flujo de información corporativa."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "LinkedIn Scraper API",
+      "date": "May 2026",
+      "bullets": [
+        "Desarrollo de API unificada para scraping de ofertas laborales de LinkedIn y generación automática de CV.",
+        "Integración de motor LaTeX para compilación de PDFs premium usando plantillas personalizadas."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "school": "Universidad de Quito",
+      "degree": "Ingeniería en Ciencias de la Computación",
+      "date": "2020 - 2024",
+      "location": "Quito, Ecuador",
+      "bullets": [
+        "Graduado con honores, especialización en Inteligencia Artificial y Sistemas Distribuidos."
+      ]
+    }
+  ],
+  "skills": {
+    "Languages": [
+      "Python",
+      "JavaScript",
+      "HTML/CSS",
+      "SQL (PostgreSQL, MySQL)",
+      "LaTeX"
+    ],
+    "Tools": [
+      "Docker",
+      "Figma",
+      "GitHub",
+      "EasyPanel",
+      "n8n"
+    ]
+  }
+}

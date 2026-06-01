@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emilio Montoya - CV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Premium Serif font mimicking Times New Roman / LaTeX style -->
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --paper-bg: #ffffff;
+            --text-main: #141414;
+            --text-muted: #4d4d4d;
+            --border-color: #d3d3d3;
+            --font-family: 'Crimson Pro', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.35;
+            padding: 2rem 1rem;
+            font-size: 11.5pt;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Letter size page styling to match LaTeX letterpaper */
+        .letter-page {
+            width: 8.5in;
+            min-height: 11in;
+            background-color: var(--paper-bg);
+            padding: 0.5in 0.5in 0.75in 0.5in;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-download {
+            background-color: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-download:hover {
+            background-color: #0f172a;
+        }
+
+        /* Header Style */
+        header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        header h1 {
+            font-size: 24pt;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: var(--text-main);
+            font-size: 10.5pt;
+        }
+
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .separator {
+            color: var(--border-color);
+            margin: 0 4px;
+        }
+
+        /* Section Headings */
+        section {
+            margin-bottom: 14px;
+        }
+
+        section h2.section-title {
+            font-size: 13pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        /* Subheading structures */
+        .subheading-container {
+            margin-bottom: 8px;
+        }
+
+        .subheading-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .subheading-title {
+            font-weight: 700;
+            font-size: 11.5pt;
+        }
+
+        .subheading-subtitle {
+            font-style: italic;
+            font-size: 11pt;
+        }
+
+        .subheading-right {
+            font-size: 10.5pt;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* Lists */
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 2px;
+        }
+
+        li {
+            font-size: 10.5pt;
+            margin-bottom: 2px;
+            position: relative;
+            padding-left: 14px;
+            text-align: justify;
+        }
+
+        li::before {
+            content: "•";
+            position: absolute;
+            left: 2px;
+            color: var(--text-main);
+            font-size: 9pt;
+            top: -1px;
+        }
+
+        /* Skills section custom list */
+        .skills-list {
+            margin-top: 4px;
+        }
+
+        .skills-line {
+            font-size: 10.5pt;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .skills-line strong {
+            font-weight: 700;
+        }
+
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            .page-wrapper {
+                display: block;
+            }
+            .letter-page {
+                width: 100%;
+                min-height: auto;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            .controls {
+                display: none;
+            }
+            .subheading-container {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button class="btn-download" onclick="downloadPDF()">
+            <i class="fas fa-file-pdf"></i> Descargar CV en PDF
+        </button>
+    </div>
+
+    <div class="page-wrapper" id="resume-content">
+        <div class="letter-page">
+            <!-- HEADER -->
+            <header>
+                <h1>Emilio Montoya</h1>
+                <div class="contact-info">
+                    <span><i class="fas fa-map-marker-alt"></i> Quito, Ecuador</span>
+<span class="separator">|</span>
+<span><i class="fas fa-phone"></i> 0998162606</span>
+<span class="separator">|</span>
+<span><i class="fas fa-envelope"></i> emimon229@gmail.com</span>
+                </div>
+            </header>
+
+            <!-- EDUCATION -->
+            <section>
+                <h2 class="section-title">EDUCATION</h2>
+                
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Universidad San Francisco de Quito (USFQ)</span>
+                <span class="subheading-right">Quito, Ecuador</span>
+            </div>
+            <div class="subheading-row">
+                <span class="subheading-subtitle">Licenciatura en Finanzas | Minor en Análisis de Datos</span>
+                <span class="subheading-right">2015 – 2019</span>
+            </div>
+            <ul><li><strong>Áreas destacadas:</strong> Inteligencia Artificial, Redes y Algoritmos.</li></ul>
+        </div>
+        
+            </section>
+
+            <!-- EXPERIENCE -->
+            <section>
+                <h2 class="section-title">EXPERIENCE</h2>
+                
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Ditextil Importaciones</span>
+                <span class="subheading-right">Quito</span>
+            </div>
+            <div class="subheading-row">
+                <span class="subheading-subtitle">Líder de Automatización e Inteligencia Artificial</span>
+                <span class="subheading-right">Ene 2025 - Presente</span>
+            </div>
+            <ul><li>Una empresa de importacion de textiles donde tuve experiencia en la automatización de tareas, creando sistemas de inteligencia artificial para operaciones, gestion de inventario, ventas y contenido ayudando a que la información cricule mas rapida entre la empresa con información de ventas con un dashboard y con canales wsp ia que acortan el paso de información entre empleados a practicamente instantanea </li></ul>
+        </div>
+        
+            </section>
+
+            <!-- PROJECTS -->
+            <section>
+                <h2 class="section-title">PROJECTS</h2>
+                
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Bot WhatsApp-Odoo ERP</span>
+                <span class="subheading-right">Ene 2024 – Presente</span>
+            </div>
+            <ul><li>Pipeline E2E automatizado para procesamiento de pedidos e integración bidireccional WhatsApp Business con Odoo ERP.</li><li>Orquestación con n8n (equivalente a SnapLogic/Talend), PostgreSQL, APIs REST y matching semántico de productos.</li><li><strong>Impacto:</strong> 50+ nodos en producción 24/7, procesamiento automatizado de pedidos sin intervención manual.</li></ul>
+        </div>
+        
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Sales Analytics Dashboard</span>
+                <span class="subheading-right">Sep 2023 – Dic 2023</span>
+            </div>
+            <ul><li>Dashboard analítico de 8 módulos con KPIs de ventas, análisis geográfico y segmentación de clientes.</li><li>Implementación en Streamlit (herramienta BI) con window functions SQL para segmentación RFM y modelos ML.</li><li><strong>Impacto:</strong>Visualización integral de métricas de negocio con predicciones automatizadas.</li></ul>
+        </div>
+        
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Sistema de Costos Automatizado</span>
+                <span class="subheading-right">Ene 2022 – Ago 2023</span>
+            </div>
+            <ul><li>Pipeline ETL extrayendo datos de emails IMAP, PDFs con pdfplumber/EasyOCR, archivos Excel y APIs Editrade.</li><li>Arquitectura multi-fuente con transformación, cálculo automatizado de costos e histórico en base de datos.</li><li><strong>Impacto:</strong> 10,732+ registros históricos procesados desde múltiples fuentes heterogéneas.</li></ul>
+        </div>
+        
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Estados de Cuenta Bancarios Automatizados</span>
+                <span class="subheading-right">Mar 2022 – Dic 2022</span>
+            </div>
+            <ul><li>Sistema automatizado de extracción, categorización y reconciliación de estados de cuenta bancarios.</li><li>Detección de anomalías mediante reglas de negocio con alertas para data quality y governance.</li><li><strong>Impacto:</strong> Categorización automática con validaciones de calidad de datos para gobernanza financiera.</li></ul>
+        </div>
+        
+        <div class="subheading-container">
+            <div class="subheading-row">
+                <span class="subheading-title">Trading Bot con SRI Integration</span>
+                <span class="subheading-right">Jun 2024 – Presente</span>
+            </div>
+            <ul><li>Bot automatizado para trading con parsing de facturas SRI mediante EasyOCR, circuit breakers y manejo de estado.</li><li>Dashboard TradingView integrado con alertas Telegram y sistema de monitoreo en producción continua.</li><li><strong>Impacto:</strong> 206+ documentos SRI procesados automáticamente, sistema 24/7 con alertas en tiempo real.</li></ul>
+        </div>
+        
+            </section>
+
+            <!-- SKILLS -->
+            <section>
+                <h2 class="section-title">SKILLS</h2>
+                <div class="skills-list">
+                    
+        <div class="skills-line">
+            <strong>Languages & DBs:</strong> Python, SQL, PostgreSQL, MySQL, SQLite
+        </div>
+        
+        <div class="skills-line">
+            <strong>Data Engineering:</strong> ETL/ELT, Data Integration, Data Pipelines, REST APIs, SOAP, Data Quality, Data Governance
+        </div>
+        
+        <div class="skills-line">
+            <strong>DevOps & Tools:</strong> n8n (SnapLogic/Talend equivalent), Docker, Git, Linux, Streamlit
+        </div>
+        
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function downloadPDF() {
+            const element = document.getElementById('resume-content');
+            const opt = {
+                margin:       0,
+                filename:     'Emilio_Montoya_CV.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2.2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
