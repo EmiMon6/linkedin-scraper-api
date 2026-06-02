@@ -374,129 +374,260 @@ class ResumePDF(FPDF):
         self.add_font('DejaVu', 'B', FONT_BOLD)
         self.add_font('DejaVu', 'I', FONT_ITALIC)
         self.add_font('DejaVu', 'BI', FONT_BOLD_ITALIC)
-        self.set_auto_page_break(auto=True, margin=54)
+        self.set_auto_page_break(auto=True, margin=50)
         self.add_page()
-        self.set_margins(36, 36, 36)
+        self.set_margins(40, 40, 40)
+        self.usable_w = self.w - self.l_margin - self.r_margin
+
+    def _safe(self, val, default=''):
+        if val is None:
+            return default
+        s = str(val).strip()
+        return s if s else default
+
+    def _auto_size(self, text, max_w, start_size, min_size=8, style=''):
+        size = start_size
+        while size > min_size:
+            self.set_font('DejaVu', style, size)
+            if self.get_string_width(text) <= max_w:
+                return size
+            size -= 0.5
+        return min_size
+
+    def _truncate(self, text, max_w, style='', size=10):
+        self.set_font('DejaVu', style, size)
+        if self.get_string_width(text) <= max_w:
+            return text
+        ellipsis = '...'
+        while len(text) > 1 and self.get_string_width(text + ellipsis) > max_w:
+            text = text[:-1].rstrip()
+        return text.rstrip(',;. ') + ellipsis
 
     def header_section(self, name, contact_info):
-        self.set_font('DejaVu', 'B', 24)
-        self.cell(0, 12, name, align='C', new_x='LMARGIN', new_y='NEXT')
-        self.ln(2)
-        self.set_font('DejaVu', '', 10)
-        self.set_text_color(80, 80, 80)
-        self.cell(0, 5, contact_info, align='C', new_x='LMARGIN', new_y='NEXT')
-        self.set_text_color(0, 0, 0)
-        self.ln(4)
-
-    def section_title(self, title):
-        self.set_font('DejaVu', 'B', 13)
+        name = self._safe(name, 'Your Name')
+        max_w = self.usable_w
+        size = self._auto_size(name, max_w, 22, min_size=14, style='B')
+        self.set_font('DejaVu', 'B', size)
         self.set_text_color(20, 20, 20)
-        self.cell(0, 8, title.upper(), new_x='LMARGIN', new_y='NEXT')
-        self.set_draw_color(200, 200, 200)
-        self.set_line_width(0.5)
-        self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
+        self.cell(0, size * 0.55, name, align='C', new_x='LMARGIN', new_y='NEXT')
+        self.ln(1)
+
+        if contact_info:
+            parts = [p.strip() for p in contact_info.split('|') if p.strip()]
+            ci_size = self._auto_size(' | '.join(parts), max_w, 10, min_size=8)
+            self.set_font('DejaVu', '', ci_size)
+            self.set_text_color(90, 90, 90)
+            self.cell(0, 5, ' | '.join(parts), align='C', new_x='LMARGIN', new_y='NEXT')
+        self.set_text_color(0, 0, 0)
         self.ln(3)
 
-    def subheading(self, left_title, right_text, left_subtitle='', right_subtitle=''):
-        self.set_font('DejaVu', 'B', 11)
-        self.set_text_color(20, 20, 20)
-        w = self.w - self.l_margin - self.r_margin
-        self.cell(w * 0.7, 5, left_title)
-        self.set_font('DejaVu', '', 10)
-        self.set_text_color(100, 100, 100)
-        self.cell(w * 0.3, 5, right_text, align='R', new_x='LMARGIN', new_y='NEXT')
-
-        if left_subtitle or right_subtitle:
-            self.set_font('DejaVu', 'I', 10)
-            self.set_text_color(60, 60, 60)
-            self.cell(w * 0.7, 5, left_subtitle)
-            self.set_font('DejaVu', '', 10)
-            self.set_text_color(100, 100, 100)
-            self.cell(w * 0.3, 5, right_subtitle, align='R', new_x='LMARGIN', new_y='NEXT')
-
-        self.set_text_color(0, 0, 0)
-        self.ln(1)
-
-    def bullet_list(self, items):
-        self.set_font('DejaVu', '', 10)
-        self.set_text_color(30, 30, 30)
-        for item in items:
-            self.set_x(self.l_margin + 4)
-            self.cell(4, 4, '-')
-            w = self.w - self.l_margin - self.r_margin - 8
-            self.multi_cell(w, 4, item, new_x='LMARGIN', new_y='NEXT')
-            self.ln(1)
+    def section_title(self, title):
+        title = self._safe(title, '').upper()
+        if not title:
+            return
+        self.set_font('DejaVu', 'B', 12)
+        self.set_text_color(25, 25, 25)
+        self.cell(0, 7, title, new_x='LMARGIN', new_y='NEXT')
+        y = self.get_y()
+        self.set_draw_color(180, 180, 180)
+        self.set_line_width(0.4)
+        self.line(self.l_margin, y, self.w - self.r_margin, y)
         self.ln(2)
 
+    def subheading(self, left_title, right_text='', left_subtitle='', right_subtitle=''):
+        left_title = self._safe(left_title)
+        right_text = self._safe(right_text)
+        left_subtitle = self._safe(left_subtitle)
+        right_subtitle = self._safe(right_subtitle)
+
+        if not left_title and not right_text and not left_subtitle and not right_subtitle:
+            return
+
+        w = self.usable_w
+        date_w = 30
+        col_left = w - date_w - 4
+        col_right = date_w
+
+        title_size = 11
+        if left_title:
+            fits = False
+            while title_size > 9:
+                self.set_font('DejaVu', 'B', title_size)
+                if self.get_string_width(left_title) <= col_left:
+                    fits = True
+                    break
+                title_size -= 0.5
+            if not fits:
+                left_title = self._truncate(left_title, col_left, 'B', title_size)
+
+        if left_title and right_text:
+            self.set_font('DejaVu', '', 9.5)
+            rt = right_text
+            if self.get_string_width(right_text) > col_right:
+                rt = self._truncate(right_text, col_right, '', 9.5)
+
+            self.set_font('DejaVu', 'B', title_size)
+            self.set_text_color(25, 25, 25)
+            self.cell(col_left, 5.2, left_title)
+            self.set_font('DejaVu', '', 9.5)
+            self.set_text_color(110, 110, 110)
+            self.cell(col_right, 5.2, rt, align='R', new_x='LMARGIN', new_y='NEXT')
+        elif left_title:
+            self.set_font('DejaVu', 'B', title_size)
+            self.set_text_color(25, 25, 25)
+            self.cell(self.usable_w, 5.2, left_title, new_x='LMARGIN', new_y='NEXT')
+        elif right_text:
+            self.set_font('DejaVu', '', 9.5)
+            self.set_text_color(110, 110, 110)
+            self.cell(self.usable_w, 5.2, right_text, align='R', new_x='LMARGIN', new_y='NEXT')
+
+        if left_subtitle or right_subtitle:
+            ls_size = 10
+            while ls_size > 8:
+                self.set_font('DejaVu', 'I', ls_size)
+                if not left_subtitle or self.get_string_width(left_subtitle) <= col_left:
+                    break
+                ls_size -= 0.5
+            if left_subtitle and self.get_string_width(left_subtitle) > col_left:
+                left_subtitle = self._truncate(left_subtitle, col_left, 'I', ls_size)
+
+            self.set_font('DejaVu', 'I', ls_size)
+            self.set_text_color(70, 70, 70)
+            self.cell(col_left, 4.8, left_subtitle)
+            if right_subtitle:
+                self.set_font('DejaVu', '', 9.5)
+                self.set_text_color(110, 110, 110)
+                self.cell(col_right, 4.8, right_subtitle, align='R', new_x='LMARGIN', new_y='NEXT')
+            else:
+                self.ln(4.8)
+
+        self.set_text_color(0, 0, 0)
+        self.ln(0.8)
+
+    def bullet_list(self, items):
+        items = items or []
+        clean_items = [self._safe(it) for it in items if self._safe(it)]
+        if not clean_items:
+            return
+        self.set_font('DejaVu', '', 9.5)
+        self.set_text_color(40, 40, 40)
+        bullet_w = 5
+        text_w = self.usable_w - bullet_w - 2
+        for item in clean_items:
+            self.set_x(self.l_margin + bullet_w)
+            self.cell(bullet_w, 4.2, '-')
+            self.set_x(self.l_margin + bullet_w + 2)
+            self.multi_cell(text_w, 4.2, item, new_x='LMARGIN', new_y='NEXT')
+        self.ln(1.5)
+
     def skills_line(self, category, skills):
-        self.set_font('DejaVu', 'B', 10)
-        self.set_text_color(20, 20, 20)
-        self.cell(self.get_string_width(f'{category}: ') + 2, 5, f'{category}: ')
-        self.set_font('DejaVu', '', 10)
-        self.set_text_color(50, 50, 50)
-        w = self.w - self.l_margin - self.r_margin - self.get_x() + self.l_margin
-        self.multi_cell(w, 5, skills, new_x='LMARGIN', new_y='NEXT')
-        self.ln(1)
+        category = self._safe(category)
+        skills = self._safe(skills)
+        if not category and not skills:
+            return
+        prefix = (category + ': ') if category else ''
+        self.set_font('DejaVu', 'B', 9.5)
+        self.set_text_color(25, 25, 25)
+        prefix_w = self.get_string_width(prefix)
+        self.cell(prefix_w, 4.5, prefix)
+        self.set_font('DejaVu', '', 9.5)
+        self.set_text_color(60, 60, 60)
+        remaining = self.usable_w - prefix_w
+        self.multi_cell(remaining, 4.5, skills, new_x='LMARGIN', new_y='NEXT')
+        self.ln(0.8)
+
+
+def _clean_url(url):
+    if not url:
+        return ''
+    return str(url).replace('https://', '').replace('http://', '').replace('www.', '').strip('/')
 
 
 def generate_pdf(data):
+    if not isinstance(data, dict):
+        data = {}
+
     pdf = ResumePDF()
 
-    name = data.get('name', 'Name')
-    contact = data.get('contact', {})
+    name = str(data.get('name') or 'Your Name').strip() or 'Your Name'
+    contact = data.get('contact') or {}
+    if not isinstance(contact, dict):
+        contact = {}
+
     contact_parts = []
-    if contact.get('location'):
-        contact_parts.append(contact['location'])
-    if contact.get('phone'):
-        contact_parts.append(contact['phone'])
-    if contact.get('email'):
-        contact_parts.append(contact['email'])
-    if contact.get('linkedin'):
-        clean_li = contact['linkedin'].replace('https://', '').replace('http://', '').replace('www.', '')
-        contact_parts.append(clean_li)
-    elif contact.get('youtube'):
-        contact_parts.append(contact['youtube'])
-    if contact.get('github'):
-        clean_gh = contact['github'].replace('https://', '').replace('http://', '').replace('www.', '')
-        contact_parts.append(clean_gh)
+    loc = str(contact.get('location') or '').strip()
+    if loc:
+        contact_parts.append(loc)
+    phone = str(contact.get('phone') or '').strip()
+    if phone:
+        contact_parts.append(phone)
+    email = str(contact.get('email') or '').strip()
+    if email:
+        contact_parts.append(email)
+    linkedin = _clean_url(contact.get('linkedin'))
+    youtube = _clean_url(contact.get('youtube'))
+    if linkedin:
+        contact_parts.append(linkedin)
+    elif youtube:
+        contact_parts.append(youtube)
+    github = _clean_url(contact.get('github'))
+    if github:
+        contact_parts.append(github)
     contact_info = ' | '.join(contact_parts)
 
     pdf.header_section(name, contact_info)
 
-    pdf.section_title('EDUCATION')
-    for edu in data.get('education', []):
-        pdf.subheading(
-            edu.get('school', ''),
-            edu.get('location', ''),
-            edu.get('degree', ''),
-            edu.get('date', '')
-        )
-        pdf.bullet_list(edu.get('bullets', []))
+    education = data.get('education') or []
+    if isinstance(education, list) and education:
+        pdf.section_title('EDUCATION')
+        for edu in education:
+            if not isinstance(edu, dict):
+                continue
+            pdf.subheading(
+                edu.get('school'),
+                edu.get('location'),
+                edu.get('degree'),
+                edu.get('date')
+            )
+            pdf.bullet_list(edu.get('bullets') or [])
 
-    pdf.section_title('EXPERIENCE')
-    for exp in data.get('experience', []):
-        pdf.subheading(
-            exp.get('company', ''),
-            exp.get('date', ''),
-            exp.get('title', ''),
-            exp.get('location', '')
-        )
-        pdf.bullet_list(exp.get('bullets', []))
+    experience = data.get('experience') or []
+    if isinstance(experience, list) and experience:
+        pdf.section_title('EXPERIENCE')
+        for exp in experience:
+            if not isinstance(exp, dict):
+                continue
+            pdf.subheading(
+                exp.get('company'),
+                exp.get('date'),
+                exp.get('title'),
+                exp.get('location')
+            )
+            pdf.bullet_list(exp.get('bullets') or [])
 
-    pdf.section_title('PROJECTS')
-    for proj in data.get('projects', []):
-        pdf.subheading(
-            proj.get('title', ''),
-            proj.get('date', '')
-        )
-        pdf.bullet_list(proj.get('bullets', []))
+    projects = data.get('projects') or []
+    if isinstance(projects, list) and projects:
+        pdf.section_title('PROJECTS')
+        for proj in projects:
+            if not isinstance(proj, dict):
+                continue
+            pdf.subheading(
+                proj.get('title'),
+                proj.get('date'),
+                '',
+                ''
+            )
+            pdf.bullet_list(proj.get('bullets') or [])
 
-    pdf.section_title('SKILLS')
-    for cat, skills_list in data.get('skills', {}).items():
-        if isinstance(skills_list, list):
-            skills_str = ', '.join(skills_list)
-        else:
-            skills_str = str(skills_list)
-        pdf.skills_line(cat, skills_str)
+    skills = data.get('skills') or {}
+    if isinstance(skills, dict) and skills:
+        pdf.section_title('SKILLS')
+        for cat, skills_list in skills.items():
+            if isinstance(skills_list, list):
+                skills_str = ', '.join(str(s).strip() for s in skills_list if str(s).strip())
+            else:
+                skills_str = str(skills_list).strip()
+            if skills_str:
+                pdf.skills_line(cat, skills_str)
 
     return pdf.output()
