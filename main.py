@@ -26,9 +26,19 @@ class UnifiedHandler(http.server.SimpleHTTPRequestHandler):
 
                 pdf_data = generate_pdf(payload)
 
+                custom_filename = payload.get("filename")
+                if custom_filename and isinstance(custom_filename, str) and custom_filename.strip():
+                    pdf_filename = custom_filename.strip()
+                    if not pdf_filename.lower().endswith('.pdf'):
+                        pdf_filename += '.pdf'
+                else:
+                    safe_name = ''.join(c if c.isalnum() or c in (' ', '_', '-') else '' for c in payload.get('name', 'CV'))
+                    safe_name = safe_name.replace(' ', '_').strip('_') or 'CV'
+                    pdf_filename = f"CV_{safe_name}.pdf"
+
                 self.send_response(200)
                 self.send_header('Content-type', 'application/pdf')
-                self.send_header('Content-Disposition', 'attachment; filename="CV_Emilio_Montoya.pdf"')
+                self.send_header('Content-Disposition', f'attachment; filename="{pdf_filename}"')
                 self.end_headers()
                 self.wfile.write(pdf_data)
                 
