@@ -410,29 +410,29 @@ class ResumePDF(FPDF):
         self.set_font('DejaVu', 'B', size)
         self.set_text_color(20, 20, 20)
         self.cell(0, size * 0.55, name, align='C', new_x='LMARGIN', new_y='NEXT')
-        self.ln(1)
+        self.ln(0.5)
 
         if contact_info:
             parts = [p.strip() for p in contact_info.split('|') if p.strip()]
             ci_size = self._auto_size(' | '.join(parts), max_w, 10, min_size=8)
             self.set_font('DejaVu', '', ci_size)
             self.set_text_color(90, 90, 90)
-            self.cell(0, 5, ' | '.join(parts), align='C', new_x='LMARGIN', new_y='NEXT')
+            self.cell(0, 4.5, ' | '.join(parts), align='C', new_x='LMARGIN', new_y='NEXT')
         self.set_text_color(0, 0, 0)
-        self.ln(3)
+        self.ln(1.5)
 
     def section_title(self, title):
         title = self._safe(title, '').upper()
         if not title:
             return
-        self.set_font('DejaVu', 'B', 12)
+        self.set_font('DejaVu', 'B', 11.5)
         self.set_text_color(25, 25, 25)
-        self.cell(0, 7, title, new_x='LMARGIN', new_y='NEXT')
+        self.cell(0, 6, title, new_x='LMARGIN', new_y='NEXT')
         y = self.get_y()
         self.set_draw_color(180, 180, 180)
         self.set_line_width(0.4)
         self.line(self.l_margin, y, self.w - self.r_margin, y)
-        self.ln(2)
+        self.ln(1.2)
 
     def subheading(self, left_title, right_text='', left_subtitle='', right_subtitle=''):
         left_title = self._safe(left_title)
@@ -448,10 +448,10 @@ class ResumePDF(FPDF):
         col_left = w - date_w - 4
         col_right = date_w
 
-        title_size = 11
+        title_size = 10.5
         if left_title:
             fits = False
-            while title_size > 9:
+            while title_size > 8.5:
                 self.set_font('DejaVu', 'B', title_size)
                 if self.get_string_width(left_title) <= col_left:
                     fits = True
@@ -468,21 +468,21 @@ class ResumePDF(FPDF):
 
             self.set_font('DejaVu', 'B', title_size)
             self.set_text_color(25, 25, 25)
-            self.cell(col_left, 5.2, left_title)
+            self.cell(col_left, 4.5, left_title)
             self.set_font('DejaVu', '', 9.5)
             self.set_text_color(110, 110, 110)
-            self.cell(col_right, 5.2, rt, align='R', new_x='LMARGIN', new_y='NEXT')
+            self.cell(col_right, 4.5, rt, align='R', new_x='LMARGIN', new_y='NEXT')
         elif left_title:
             self.set_font('DejaVu', 'B', title_size)
             self.set_text_color(25, 25, 25)
-            self.cell(self.usable_w, 5.2, left_title, new_x='LMARGIN', new_y='NEXT')
+            self.cell(self.usable_w, 4.5, left_title, new_x='LMARGIN', new_y='NEXT')
         elif right_text:
             self.set_font('DejaVu', '', 9.5)
             self.set_text_color(110, 110, 110)
-            self.cell(self.usable_w, 5.2, right_text, align='R', new_x='LMARGIN', new_y='NEXT')
+            self.cell(self.usable_w, 4.5, right_text, align='R', new_x='LMARGIN', new_y='NEXT')
 
         if left_subtitle or right_subtitle:
-            ls_size = 10
+            ls_size = 9.5
             while ls_size > 8:
                 self.set_font('DejaVu', 'I', ls_size)
                 if not left_subtitle or self.get_string_width(left_subtitle) <= col_left:
@@ -493,16 +493,16 @@ class ResumePDF(FPDF):
 
             self.set_font('DejaVu', 'I', ls_size)
             self.set_text_color(70, 70, 70)
-            self.cell(col_left, 4.8, left_subtitle)
+            self.cell(col_left, 4, left_subtitle)
             if right_subtitle:
-                self.set_font('DejaVu', '', 9.5)
+                self.set_font('DejaVu', '', 9)
                 self.set_text_color(110, 110, 110)
-                self.cell(col_right, 4.8, right_subtitle, align='R', new_x='LMARGIN', new_y='NEXT')
+                self.cell(col_right, 4, right_subtitle, align='R', new_x='LMARGIN', new_y='NEXT')
             else:
-                self.ln(4.8)
+                self.ln(4)
 
         self.set_text_color(0, 0, 0)
-        self.ln(0.8)
+        self.ln(0.3)
 
     def bullet_list(self, items):
         items = items or []
@@ -511,14 +511,14 @@ class ResumePDF(FPDF):
             return
         self.set_font('DejaVu', '', 9.5)
         self.set_text_color(40, 40, 40)
-        bullet_w = 5
-        text_w = self.usable_w - bullet_w - 2
+        bullet_w = 4
+        text_w = self.usable_w - bullet_w - 1
         for item in clean_items:
             self.set_x(self.l_margin + bullet_w)
-            self.cell(bullet_w, 4.2, '-')
-            self.set_x(self.l_margin + bullet_w + 2)
-            self.multi_cell(text_w, 4.2, item, new_x='LMARGIN', new_y='NEXT')
-        self.ln(1.5)
+            self.cell(bullet_w, 3.8, '-')
+            self.set_x(self.l_margin + bullet_w + 1)
+            self.multi_cell(text_w, 3.8, item, new_x='LMARGIN', new_y='NEXT')
+        self.ln(0.8)
 
     def skills_line(self, category, skills):
         category = self._safe(category)
@@ -529,12 +529,12 @@ class ResumePDF(FPDF):
         self.set_font('DejaVu', 'B', 9.5)
         self.set_text_color(25, 25, 25)
         prefix_w = self.get_string_width(prefix)
-        self.cell(prefix_w, 4.5, prefix)
+        self.cell(prefix_w, 4, prefix)
         self.set_font('DejaVu', '', 9.5)
         self.set_text_color(60, 60, 60)
         remaining = self.usable_w - prefix_w
-        self.multi_cell(remaining, 4.5, skills, new_x='LMARGIN', new_y='NEXT')
-        self.ln(0.8)
+        self.multi_cell(remaining, 4, skills, new_x='LMARGIN', new_y='NEXT')
+        self.ln(0.4)
 
 
 def _clean_url(url):
